@@ -48,8 +48,8 @@ def format_snname(name):
 #  SN Data                     #
 #                              #
 ################################
-SNF_DATA_META      = DATAPATH+"/SNF-0203-CABALLOa_META.pkl"
-SNF_DATA_HUBBLIZER = DATAPATH+"/SNF-0203-CABALLOa_hubblefit_data.pkl"
+SNF_DATA_META      = DATAPATH+"/SNf_SNeIa/META.pkl"
+SNF_DATA_HUBBLIZER = DATAPATH+"/SNF-0203-ALLEG2a_hubblefit_data.pkl"
 SNF_DATA_PHRENO    = DATAPATH+"/phrenology_2015_06_15_ALLAIRE_AtMax.pkl"
 def get_snf_data(kind):
     """

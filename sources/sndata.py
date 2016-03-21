@@ -26,7 +26,10 @@ class SNfSource( SourceCollection ):
     
     
     def create(self,sources=["idr","hubblizer","phreno"],
-                        build=False,snnames=None):
+               buildkeys=["x1","color","zcmb","HR","oHR","EWCaIIHK",
+                             "EWSiII4000","EWSiII5972","EWSiII6355",
+                             "Rsjb","vSiII_4128","vSiII_6355"],
+                             snnames=None):
         """
         """
         for source in sources:
@@ -38,11 +41,11 @@ class SNfSource( SourceCollection ):
         self._update_()
         usednames = snnames if snnames is not None else self.all_avialable_names
         
-        if build:
+        if buildkeys is not None and len(buildkeys)>1:
             self.build(keys=["x1","color","zcmb","HR","oHR","EWCaIIHK",
                              "EWSiII4000","EWSiII5972","EWSiII6355",
                              "Rsjb","vSiII_4128","vSiII_6355"],
-                       snnames=self.all_avialable_names)
+                        snnames=self.all_avialable_names)
             
     # =========================== #
     # = Properties              = #

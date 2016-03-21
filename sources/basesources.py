@@ -172,8 +172,8 @@ class BaseSources( BaseObject ):
         if ax is None:
             fig = mpl.figure(figsize=[8,8])
             ax  = fig.add_axes([0.1,0.1,0.8,0.8])
-            ax.set_xlabel(r"$\mathrm{%s}$"%xkey,fontsize="x-large")
-            ax.set_ylabel(r"$\mathrm{%s}$"%ykey,fontsize="x-large")
+            ax.set_xlabel(r"$\mathrm{%s}$"%xkey.replace("_","\ "),fontsize="x-large")
+            ax.set_ylabel(r"$\mathrm{%s}$"%ykey.replace("_","\ "),fontsize="x-large")
         elif "hist" not in dir(ax):
             raise TypeError("The given 'ax' most likely is not a matplotlib axes. "+\
                              "No imshow available")
