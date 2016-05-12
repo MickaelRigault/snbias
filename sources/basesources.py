@@ -5,7 +5,7 @@ import numpy as np
 import warnings
 
 from astropy.table import Table
-from astrobject.astrobject.baseobject import BaseObject
+from astrobject import BaseObject
 from astrobject.astrobject.collection import BaseCollection
 from astrobject.utils import statbox
 from astrobject.utils.tools import kwargs_update
@@ -58,8 +58,8 @@ class BaseSources( BaseObject ):
     """
     __nature__ = "Source"
     _error_index = "_err"
-    _properties_keys = ["data"]
-    _derived_properties_keys = ["keys","snnames"]
+    PROPERTIES         = ["data"]
+    DERIVED_PROPERTIES = ["keys","snnames"]
 
     # =========================== #
     # = Construction            = #
@@ -362,14 +362,7 @@ class BaseSources( BaseObject ):
 class SourceCollection( BaseSources, BaseCollection ):
     """
     """
-    def __build__(self):
-        """
-        """
-        for new_prop in ["handler","sourcerank"]:
-            self._properties_keys.append(new_prop)
-
-        super(SourceCollection,self).__build__()
-        
+    PROPERTIES = ["handler","sourcerank"]        
     
     def add_source(self,newsource,id_,rank=-1,
                    force_it=False,keys=None):

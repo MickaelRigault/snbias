@@ -51,6 +51,13 @@ class SNfSource( SourceCollection ):
     # = Properties              = #
     # =========================== #
     @property
+    def maskredshiftmain(self):
+        """This return False if the SN is not 'good' as defined in the idr"""
+        return np.asarray([(self.get_source_sn_key("idr",snname,"zcmb") <0.023) or
+                           (self.get_source_sn_key("idr",snname,"zcmb") >=0.08)
+                           for snname in self.snnames],dtype="bool")
+    
+    @property
     def maskgood(self):
         """This return False if the SN is not 'good' as defined in the idr"""
         return self.masktraining * self.maskvalidation
@@ -68,7 +75,8 @@ class SNfSource( SourceCollection ):
         """The returns False if the SN is not in the 'training' idr subset"""
         if "idr" not in self.sourcerank:
             raise AttributeError("the ìdr` source is not loaded.")
-        return np.asarray([self.get_source_sn_key("idr",snname,"subset") != "validation"
+        return np.asarray([self.get_source_sn_key("idr",snname,"subset")\
+                            != "validation"
                            for snname in self.snnames],dtype="bool")
     
         

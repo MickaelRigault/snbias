@@ -6,7 +6,7 @@
 import os
 import sys
 import numpy as np
-from astropy import constants
+from astropy import constants,table
 from astrobject.utils.tools import load_pkl,dump_pkl
 
 #########################################
@@ -45,12 +45,37 @@ def format_snname(name):
 
 ################################
 #                              #
+#  Cepheid Data                #
+#                              #
+################################
+CEPHEIDSNE_RIESS16=DATAPATH+"/Riess16/cepheid_sne_distances.dat"
+SNEIA_RIESS16=DATAPATH+"/Riess16/scolnic_snedata.dat"
+_FIXED_SNEIA_RIESS16=DATAPATH+"/Riess16/scolnic_snedata_rest.dat"
+def get_riess16_cepheidsn():
+    """ Astropy Table of the Table 5 of Riess et al. 2016. Cepheid SN data information """
+    return table.Table.read(CEPHEIDSNE_RIESS16, format="csv", fast_reader=False, comment="#")
+
+def get_riess16_sndata():
+    """ SN Ia data used by Riess et al. 2016, from D. Scolnic (http://kicp.uchicago.edu/~dscolnic/Supercal/supercal_vH0.fitres; 7th of April 2016)
+    Base on "supercal.fitres" header:
+    abs(x1)<3, abs(c)<0.3, fitprob>0.01, pkmjderr<2.0, x1err<1.0, and some reasonable 3-4 sigma cut on Hubble Residual (mures) outliers
+
+    Do not use stone and colfax
+    """
+    maintable = table.Table.read(SNEIA_RIESS16, format="ascii", guess=False)
+    endtable = table.Table.read(_FIXED_SNEIA_RIESS16, format="ascii", guess=False)
+    
+    return table.vstack([maintable,endtable])
+
+################################
+#                              #
 #  SN Data                     #
 #                              #
 ################################
 SNF_DATA_META      = DATAPATH+"/SNf_SNeIa/META.pkl"
-SNF_DATA_HUBBLIZER = DATAPATH+"/SNF-0203-ALLEG2a_hubblefit_data.pkl"
+SNF_DATA_HUBBLIZER = DATAPATH+"/SNF-0203-ALLEG2a_SNeIa_hubble.pkl"
 SNF_DATA_PHRENO    = DATAPATH+"/phrenology_2015_06_15_ALLAIRE_AtMax.pkl"
+
 def get_snf_data(kind):
     """
     Access the SNfactory data. kind is phreno/hubblizer/idr.
@@ -61,24 +86,19 @@ def get_snf_data(kind):
     # -------------------
     if kind=="hubblizer":
         dico =  load_pkl(SNF_DATA_HUBBLIZER)
-    
-        dicoHubblecorr   = dico['corr']
-        dicoHubbleuncorr = dico['raw']
-
         data = {}
-        for name,mu,zcmb,HR,HR_err,oHR,oHR_err,x1,color in zip(
-                [name for name in dicoHubblecorr["Data_in"]['sne']],
-                dicoHubblecorr["Data_in"]['m'],
-                dicoHubblecorr["Data_in"]['z'],
-                dicoHubblecorr["Data_out"]['residuals'],
-                np.sqrt(dicoHubblecorr["Data_out"]['variance_no_disp']),
-                dicoHubbleuncorr["Data_out"]['residuals'],
-                np.sqrt(dicoHubbleuncorr["Data_out"]['variance_no_disp']),
-                dicoHubblecorr['Data_in']['corrections'][0],
-                dicoHubblecorr['Data_in']['corrections'][1]
-                ):
-            data[name]={"mu":mu,"zcmb":zcmb,"HR":HR,"HR_err":HR_err,
-                        "oHR":oHR,"oHR_err":oHR_err,"x1":x1,"color":color}
+        for name,d in dico.items():
+            if "hubblizer.mBfit" not in d.keys():
+                continue
+            data[name]={"zcmb":d['host.zcmb'],
+                        "mu":d['hubblizer.mBfit'],
+                        "mu.err":d['hubblizer.mBfit.err'],
+                        "HR":d['hubblizer.dmfit_corr'],
+                        "HR_err":d['hubblizer.dmfit_corr.err'],
+                        "oHR":d['hubblizer.dmfit_orig'],
+                        "oHR_err":d['hubblizer.dmfit_orig.err'],
+                        "x1":d["salt2.X1"],
+                        "color":d["salt2.Color"]}
         return data
     
     # -------------------
@@ -123,7 +143,7 @@ def get_snf_data(kind):
 # ======================= #
 # =  Local SNf Data     = #
 # ======================= #
-LOCAL_SNF_DATA=DATAPATH+"/LocalSpectralFit_1.0kpc.pkl"
+LOCAL_SNF_DATA=DATAPATH+"/SNf_localhost/localhost_idr.pkl"
 
 def get_local_hostdata():
     """ This is the data created by the SNfactory local galaxy stellar free fits"""
